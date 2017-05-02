@@ -31,18 +31,23 @@ def extract_network():
     filetext = textfile.read()
     textfile.close()
     nodes, links = [], []
-    
+
     BEGIN_COM = 16641
     END_COM = 17262
 
     with open('./data/CA_statutes.csv', 'rb') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
         data = [d for d in spamreader]
-    
+
+    search_regex = "^([A-Z\s]+)\s([0-9\s]+)$"
     for line in data[BEGIN_COM: END_COM]:
         # Find the column with section number
         section_num_index = 0
-        print line[2]
+        for i in range(len(line)):
+            if re.match(search_regex, line[i]):
+                section_num_index = i
+                print i
+                break
 
         # Look for the statute for section mentions
 
