@@ -6,7 +6,7 @@ visualizer.py
 
 import json
 import csv
-
+import re
 
 def extract_network():
     '''
@@ -32,10 +32,16 @@ def extract_network():
     textfile.close()
     nodes, links = [], []
     
+    BEGIN_COM = 16641
+    END_COM = 17262
+
     with open('./data/CA_statutes.csv', 'rb') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
-        for line in spamreader:
-            print line[0]
+        data = [d for d in spamreader]
+    
+    for line in data[BEGIN_COM: END_COM]:
+        
+        print line[2]
             
 
     return nodes, links
@@ -54,7 +60,7 @@ def visualize_network(nodes, links):
 
 def main():
     nodes, links = extract_network()
-    # visualize_network(nodes, links)
+    visualize_network(nodes, links)
 
 if __name__ == "__main__":
     main()
