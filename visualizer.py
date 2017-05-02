@@ -27,13 +27,16 @@ def extract_network():
         {"source": "Cravatte", "target": "Myriel", "value": 1}
       ]
     '''
-    textfile = open("CA_statutes.csv", 'r')
+    textfile = open("./data/CA_statutes.csv", 'r')
     filetext = textfile.read()
     textfile.close()
     nodes, links = [], []
     
-    for line in filetext:
-        print line
+    with open('./data/CA_statutes.csv', 'rb') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        for line in spamreader:
+            print line[0]
+            
 
     return nodes, links
 
@@ -51,7 +54,7 @@ def visualize_network(nodes, links):
 
 def main():
     nodes, links = extract_network()
-    visualize_network(nodes, links)
+    # visualize_network(nodes, links)
 
 if __name__ == "__main__":
     main()
