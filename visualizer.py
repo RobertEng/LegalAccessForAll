@@ -4,6 +4,10 @@ visualizer.py
 
 '''
 
+import json
+import csv
+
+
 def extract_network():
     '''
     Extract the information needed to visualize the statutes in a network.
@@ -23,7 +27,13 @@ def extract_network():
         {"source": "Cravatte", "target": "Myriel", "value": 1}
       ]
     '''
+    textfile = open("CA_statutes.csv", 'r')
+    filetext = textfile.read()
+    textfile.close()
     nodes, links = [], []
+    
+    for line in filetext:
+        print line
 
     return nodes, links
 
@@ -32,8 +42,11 @@ def visualize_network(nodes, links):
     '''
     Visualize the passed in nodes and links in d3.js
     '''
-    pass
-
+    network = {}
+    network['nodes'] = nodes
+    network['links'] = links
+    with open('network.json', 'w') as f:
+        json.dump(network, f)
 
 
 def main():
