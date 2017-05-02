@@ -41,7 +41,7 @@ def extract_network():
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
         data = [d for d in spamreader]
 
-    search_regex = "^([A-Z\s]+)\s([0-9\s]+)$"
+    search_regex = "^([A-Z\s])+\s*(App.)?\s+([0-9.])+$"
     for line in data[BEGIN_COM: END_COM]:
         # Keep track of the division so we can separate nodes into groups by
         # division. Increment if a new division is seen.
