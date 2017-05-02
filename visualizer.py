@@ -31,6 +31,8 @@ def extract_network():
     filetext = textfile.read()
     textfile.close()
     nodes, links = [], []
+    current_division = ""
+    current_division_num = 0
     
     BEGIN_COM = 16641
     END_COM = 17262
@@ -40,15 +42,41 @@ def extract_network():
         data = [d for d in spamreader]
     
     for line in data[BEGIN_COM: END_COM]:
+        # Keep track of the division so we can separate nodes into groups by
+        # division. Increment if a new division is seen.
+        if line[0] != current_division:
+            current_division = line[0]
+            current_division_num += 1
+
         # Find the column with section number
         section_num_index = 0
-        print line[2]
 
-        # Look for the statute for section mentions
+        
 
+        statute_title = m.group(0).strip()
+        statute_num = m.group(1)
 
+        # If I haven't seen this statute section yet, add it as a node
+        if not any(n['id'] === statute_title for n in nodes):
+            node = {}
+            node['id'] = statute_title
+            node['group'] = current_division_num
+            nodes.append(node)
 
+        # Look in the statute for mentions of other section
+        statute = ' '.join(line[section_num_index + 1:])
+        # example = "the case of a motor vehicle, as defined in Section 415 of the Vehicle Code, or a trailer, as defined in Section 630 of that code, that is not to be used primarily for personal, family, or household purposes, that the amount of rental payments may be increased or decreased - See more at: http://codes.findlaw.com/ca/commercial-code/com-sect-1203.html#sthash.BU0brds0.dpuf"
+        # statute = example
 
+        pattern = re.compile(r"Section (\d+)", re.IGNORECASE)
+        seen = set() # Keep track of sections we've seen, so we don't add twice
+        for m in re.finditer(pattern, statute):
+            if m.group(1) not in seen:
+                link = {}
+                link['source'] = statute_title + ' ' + statute_num
+                link['target'] = statute_title + ' ' + m.group(1)
+                link['value'] = 1
+                links.append(link)
 
     return nodes, links
 
