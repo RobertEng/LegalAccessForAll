@@ -41,29 +41,34 @@ def extract_network():
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
         data = [d for d in spamreader]
 
-    search_regex = "^([A-Z\s]+)\s([0-9\s]+)$"
+    search_regex = "^([A-Z\s]+)\s([0-9.\s]+)$"
     for line in data[BEGIN_COM: END_COM]:
         # Keep track of the division so we can separate nodes into groups by
         # division. Increment if a new division is seen.
-        if line[0] != current_division:
-            current_division = line[0]
+        if len(line) > 0 and line[1] != current_division:
+            current_division = line[1]
             current_division_num += 1
 
         # Find the column with section number
         section_num_index = 0
         for i in range(len(line)):
-            if re.match(search_regex, line[i]):
+            m = re.match(search_regex, line[i])
+            if m:
                 section_num_index = i
-                print i
                 break
+        
+        # Who knows what happened. Couldn't find section number
+        if not m:
+            continue
 
-        statute_title = m.group(0).strip()
-        statute_num = m.group(1)
+        statute_title = m.group(1).strip()
+        statute_num = m.group(2)
+        statute_fullname = statute_title + ' ' + statute_num
 
         # If I haven't seen this statute section yet, add it as a node
-        if not any(n['id'] === statute_title for n in nodes):
+        if all(n['id'] != statute_fullname for n in nodes):
             node = {}
-            node['id'] = statute_title
+            node['id'] = statute_fullname
             node['group'] = current_division_num
             nodes.append(node)
 
@@ -81,6 +86,20 @@ def extract_network():
                 link['target'] = statute_title + ' ' + m.group(1)
                 link['value'] = 1
                 links.append(link)
+
+    # Some nodes are unfortunately not caught/parsed but still show up in the
+    # statutes. Add the nodes.
+    for l in links:
+        if all(l['source'] != n['id'] for n in nodes):
+            node = {}
+            node['id'] = l['source']
+            node['group'] = 0
+            nodes.append(node)
+        if all(l['target'] != n['id'] for n in nodes):
+            node = {}
+            node['id'] = l['target']
+            node['group'] = 0
+            nodes.append(node)
 
     return nodes, links
 
