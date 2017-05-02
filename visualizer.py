@@ -40,7 +40,8 @@ def extract_network():
     with open('./data/CA_statutes.csv', 'rb') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
         data = [d for d in spamreader]
-    
+
+    search_regex = "^([A-Z\s]+)\s([0-9\s]+)$"
     for line in data[BEGIN_COM: END_COM]:
         # Keep track of the division so we can separate nodes into groups by
         # division. Increment if a new division is seen.
@@ -50,8 +51,11 @@ def extract_network():
 
         # Find the column with section number
         section_num_index = 0
-
-        
+        for i in range(len(line)):
+            if re.match(search_regex, line[i]):
+                section_num_index = i
+                print i
+                break
 
         statute_title = m.group(0).strip()
         statute_num = m.group(1)
