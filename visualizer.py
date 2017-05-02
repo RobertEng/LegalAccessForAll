@@ -40,9 +40,15 @@ def extract_network():
         data = [d for d in spamreader]
     
     for line in data[BEGIN_COM: END_COM]:
-        
+        # Find the column with section number
+        section_num_index = 0
         print line[2]
-            
+
+        # Look for the statute for section mentions
+
+
+
+
 
     return nodes, links
 
