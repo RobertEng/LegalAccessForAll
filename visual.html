@@ -1,43 +1,30 @@
 <!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Bootstrap! -->
-  <!-- Latest compiled and minified CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <!-- jQuery library -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <!-- Latest compiled JavaScript -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" media="screen" href="./index.css" />
+<meta charset="utf-8">
+<style>
 
-</head>
-<body>
-  <div class="jumbotron">
-      <div id="title"><h1>Legal Access for All</h1></div>
-      <p>A data visualizer aiming to provide open accessible legal information for the layperson, legal researcher, and data scientist via pipeline from courthouse to your house.</p>
-  </div>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-12">
-        <svg width="1380" height="420">
-       </svg>
-      </div>
-    </div>
-  </div>
-</body>
+.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
 
-<!--- Data Visualization JS --->
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+</style>
+<svg width="1500" height="1000"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
+
+
 
 var radius = 5;
 var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-var color = d3.scaleOrdinal()
-    .range(["#88cee9", "#ffbb72", "#029cd7", "#cc6a00", "#012938"])
+var color = d3.scaleOrdinal(d3.schemeCategory20);
 
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }))
@@ -107,4 +94,3 @@ function dragended(d) {
 }
 
 </script>
-</html>
