@@ -9,5 +9,7 @@ Rahul Bachal, Anne Zhou, Sandra Ning, Josh Chen, Robert Eng
 
 ## Visualization
  * Run `visualizer.py`
- * Open `index.html` in insecure browser
+ * Open `index.html` in browser
  * Visualization uses d3.js
+ * View the visualization here:
+   [Visualization](https://roberteng.github.io/LegalAccessForAll/)
