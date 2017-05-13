@@ -263,6 +263,25 @@ def helper_enforce_refers_exist(cur, seen):
             helper_enforce_refers_exist(c, seen)
 
 
+def helper_convert_statute_to_link(statute):
+    """
+    Converts an input of a statute <type 'dict'> and returns a string 
+    corresponding to the URL of that statute.
+    """
+
+    code = statute['titles'][0]
+    code_labels = [label.lower().strip('california').strip() \
+                   for label in code.split('-')]
+    sect = statute['id'].split(' ')[-1]
+
+    # Construct URL
+    url = 'http://codes.findlaw.com/ca/'
+    url += code_labels[0].replace(' ', '-') + '/'
+    url += code_labels[1] + '-sect-' + sect + '.html'
+
+    return url
+
+
 def main():
     data = process_scraper_data()
     # data_to_force_graph(data)
