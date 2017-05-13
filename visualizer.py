@@ -228,22 +228,21 @@ def data_to_collapsible_graph(data):
     for c in network['children']:
         c['collapsible'] = True
 
-
     # Sanity check the references to ensure there are corresponding names.
     # Remove references if they don't exist.
     seen = set()
     helper_collect_names(network, seen)
     helper_enforce_refers_exist(network, seen)
-    # print seen
-
-
-    # print network
 
     with open('collapsible.json', 'w') as f:
         json.dump(network, f)
 
 
 def helper_collect_names(cur, seen):
+    '''
+    Recursive helper function for data_to_collapsible_graph. Meant to collect 
+    up the ids (names) of the statutes.
+    '''
     if "children" not in cur:
         seen.add(cur['name'])
     else:
@@ -252,14 +251,16 @@ def helper_collect_names(cur, seen):
 
 
 def helper_enforce_refers_exist(cur, seen):
+    '''
+    Recursively helper function for data_to_collapsible_graph. Make sure 
+    the references within each statute actually exist.
+    '''
     if "children" not in cur:
         if "refers" in cur:
             cur['refers'] = list(seen.intersection(set(cur['refers'])))
     else:
         for c in cur['children']:
             helper_enforce_refers_exist(c, seen)
-
-
 
 
 def main():
