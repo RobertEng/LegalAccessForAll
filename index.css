@@ -68,6 +68,10 @@ body {
   stroke-width: 1.5px;
 }
 
+.nodes {
+  pointer-events: all;
+}
+
 svg {
   background-color: #15202e;
 }

@@ -58,7 +58,11 @@ d3.json("network.json", function(error, graph) {
       .attr("class", "nodes")
     .selectAll("circle")
     .data(graph.nodes)
-    .enter().append("circle")
+    .enter()
+    .append("a")
+      .attr("xlink:href", function(d) { return d.url; })
+      .attr("target", "_blank")
+    .append("circle")
       .attr("r", radius)
       .attr("fill", function(d) { return color(d.group); })
       .call(d3.drag()
@@ -68,6 +72,10 @@ d3.json("network.json", function(error, graph) {
 
   node.append("title")
       .text(function(d) { return d.id; });
+
+  // node.append("svg:a")
+  //     .attr("xlink:href", function(d) { return d.url; })
+  //     .attr("target", "_blank");
 
   simulation
       .nodes(graph.nodes)

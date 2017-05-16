@@ -39,15 +39,15 @@ def process_scraper_data():
          "text": ["(a)In this division unless the context otherwise requires:",
                   "(1)Account means any deposit or credit account with a bank,
                    including a demand, time, savings, passbook, share draft, or
-                   like account, other than an account evidenced by a 
+                   like account, other than an account evidenced by a
                    certificate of deposit."]},
         {"id": ... }
     ]
     '''
-    statutes_file = 'CA_statutes_sample.csv'
+    statutes_file = 'CA_statutes.csv'
     BEGIN_COM = 16641
     END_COM = 17262
-    
+
     data = []
     with open(DATA_FOLDER + statutes_file, 'rb') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -64,7 +64,7 @@ def process_scraper_data():
                     print "The section number was the first one! Something's fishy"
                     sys.exit()
                 break
-        
+
         # Couldn't find section number. Who knows what happened.
         if not m:
             print 'Could not find section title and num. Build a better regex!'
@@ -82,6 +82,7 @@ def process_scraper_data():
         datum['id'] = statute_fullname
         datum['titles'] = line[:section_num_index]
         datum['text'] = line[section_num_index + 1:]
+        datum['url'] = helper_convert_statute_to_link(datum)
         data.append(datum)
     return data
 
@@ -99,7 +100,7 @@ def data_to_force_graph(data):
         {"source": "Napoleon", "target": "Myriel", "value": 1},
         {"source": "Mlle.Baptistine", "target": "Myriel", "value": 8},
         {"source": "Cravatte", "target": "Myriel", "value": 1}
-      ]    
+      ]
     '''
     nodes, links = [], []
     divisions = ["None"]
@@ -117,13 +118,14 @@ def data_to_force_graph(data):
             node['group'] = 0
         statute = ' '.join(d['text'])
         node['statute'] = statute
+        node['url'] = d['url']
         nodes.append(node)
 
         # Add the links to sections which are mentioned in this statute
         pattern = re.compile(r"Section (\d+)", re.IGNORECASE)
         seen = set() # Keep track of sections we've seen, so we don't add twice
         statute_title = re.match("^([A-Z\s&]+)\s([0-9.]+)$", d['id']).group(1)
-        
+
         for m in re.finditer(pattern, statute):
             if m.group(1) not in seen:
                 link = {}
@@ -204,7 +206,7 @@ def data_to_collapsible_graph(data):
 
         if 'children' not in cur:
             cur['children'] = []
-        node = {"name": d['id'], "group": groupid}
+        node = {"name": d['id'], "group": groupid, "url": d['url']}
 
         # Add the links to sections which are mentioned in this statute
         statute = ' '.join(d['text'])
@@ -240,7 +242,7 @@ def data_to_collapsible_graph(data):
 
 def helper_collect_names(cur, seen):
     '''
-    Recursive helper function for data_to_collapsible_graph. Meant to collect 
+    Recursive helper function for data_to_collapsible_graph. Meant to collect
     up the ids (names) of the statutes.
     '''
     if "children" not in cur:
@@ -252,7 +254,7 @@ def helper_collect_names(cur, seen):
 
 def helper_enforce_refers_exist(cur, seen):
     '''
-    Recursively helper function for data_to_collapsible_graph. Make sure 
+    Recursively helper function for data_to_collapsible_graph. Make sure
     the references within each statute actually exist.
     '''
     if "children" not in cur:
@@ -265,7 +267,7 @@ def helper_enforce_refers_exist(cur, seen):
 
 def helper_convert_statute_to_link(statute):
     """
-    Converts an input of a statute <type 'dict'> and returns a string 
+    Converts an input of a statute <type 'dict'> and returns a string
     corresponding to the URL of that statute.
     """
 
@@ -284,8 +286,8 @@ def helper_convert_statute_to_link(statute):
 
 def main():
     data = process_scraper_data()
-    # data_to_force_graph(data)
-    data_to_collapsible_graph(data)
+    data_to_force_graph(data)
+    # data_to_collapsible_graph(data)
 
 if __name__ == "__main__":
     main()
