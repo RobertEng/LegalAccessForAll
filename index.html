@@ -31,10 +31,11 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
-var radius = 5;
+var radius = 50;
 var svg = d3.select("svg"),
     width = +svg.attr("width"),
-    height = +svg.attr("height");
+    height = +svg.attr("height"),
+    root;
 
 var color = d3.scaleOrdinal()
     .range(["#88cee9", "#ffbb72", "#029cd7", "#cc6a00", "#012938"])
@@ -44,20 +45,28 @@ var simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-d3.json("network.json", function(error, graph) {
-  if (error) throw error;
+var link = svg.selectAll(".links"),
+    node = svg.selectAll(".nodes");
 
-  var link = svg.append("g")
-      .attr("class", "links")
-    .selectAll("line")
-    .data(graph.links)
-    .enter().append("line")
-      .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+d3.json("collapsible.json", function(error, graph) {
+  if (error) throw error;
+  root = graph;
+  update();
+});
+
+function update() {
+  // var link = svg.append("g")
+  //     .attr("class", "links")
+  //   .selectAll("line")
+  //   .data(root.links)
+  //   .enter().append("line")
+  //     .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+  var nodes = flatten(root);
 
   var node = svg.append("g")
       .attr("class", "nodes")
     .selectAll("circle")
-    .data(graph.nodes)
+    .data(nodes, function(d) { return d.name; })
     .enter()
     .append("a")
       .attr("xlink:href", function(d) { return d.url; })
@@ -69,20 +78,21 @@ d3.json("network.json", function(error, graph) {
           .on("start", dragstarted)
           .on("drag", dragged)
           .on("end", dragended));
-
-  node.append("title")
-      .text(function(d) { return d.id; });
-
-  // node.append("svg:a")
-  //     .attr("xlink:href", function(d) { return d.url; })
-  //     .attr("target", "_blank");
-
   simulation
-      .nodes(graph.nodes)
+      .nodes(nodes)
       .on("tick", ticked);
 
-  simulation.force("link")
-      .links(graph.links);
+  node.selectAll("circle")
+    .data(nodes, function(d) { return d.name; })
+    .append("text")
+      .text(function(d) { return d.name; });
+
+
+  simulation.start();
+
+  // simulation
+  //     .force("link")
+  //     .links(graph.links);
 
   function ticked() {
     link
@@ -91,11 +101,11 @@ d3.json("network.json", function(error, graph) {
         .attr("x2", function(d) { return d.target.x; })
         .attr("y2", function(d) { return d.target.y; });
 
-    node
+    node.circle
         .attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
         .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
   }
-});
+}
 
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
@@ -112,6 +122,21 @@ function dragended(d) {
   if (!d3.event.active) simulation.alphaTarget(0);
   d.fx = null;
   d.fy = null;
+}
+
+// Returns a list of all nodes under the root.
+function flatten(root) {
+  var nodes = [], i = 0;
+  nodes.push(root);
+  // function recurse(node) {
+  //   if (node.children) node.children.forEach(recurse);
+  //   if (!node.id) node.id = ++i;
+  //   nodes.push(node);
+  // }
+  //
+  // recurse(root);
+  console.log(nodes);
+  return nodes;
 }
 
 </script>

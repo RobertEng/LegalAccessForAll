@@ -66,6 +66,16 @@ body {
 .nodes circle {
   stroke: #ececed;
   stroke-width: 1.5px;
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+}
+
+text {
+  z-index:999;
+  background-color: #fff;
+  margin-left: -25px;
+  text-anchor: middle;
 }
 
 .nodes {
