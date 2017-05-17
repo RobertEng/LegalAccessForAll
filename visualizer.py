@@ -102,7 +102,7 @@ def data_to_force_graph(data):
         {"source": "Cravatte", "target": "Myriel", "value": 1}
       ]
     '''
-    nodes, links = [], []
+    nodes, links = {}, []
     divisions = ["None"]
     for d in data:
         node = {}
@@ -119,7 +119,9 @@ def data_to_force_graph(data):
         statute = ' '.join(d['text'])
         node['statute'] = statute
         node['url'] = d['url']
-        nodes.append(node)
+        node['d'] = 0
+        nodes[d['id']] = node
+        # nodes.append(node)
 
         # Add the links to sections which are mentioned in this statute
         pattern = re.compile(r"Section (\d+)", re.IGNORECASE)
@@ -134,19 +136,30 @@ def data_to_force_graph(data):
                 link['value'] = 1
                 links.append(link)
 
+
     # Some nodes are unfortunately not caught/parsed but still show up in the
     # statutes. Add the nodes.
     for l in links:
-        if all(l['source'] != n['id'] for n in nodes):
+        if all(l['source'] != n['id'] for n in nodes.values()):
             node = {}
             node['id'] = l['source']
             node['group'] = 0
-            nodes.append(node)
-        if all(l['target'] != n['id'] for n in nodes):
+            node['d'] = 0
+            nodes[node['id']] = node
+            # nodes.append(node)
+        if all(l['target'] != n['id'] for n in nodes.values()):
             node = {}
             node['id'] = l['target']
             node['group'] = 0
-            nodes.append(node)
+            node['d'] = 0
+            nodes[node['id']] = node
+            # nodes.append(node)
+
+    for link in links:
+        nodes[link['target']]['d'] += 1
+
+
+    nodes = nodes.values()
 
     network = {}
     network['nodes'] = nodes
